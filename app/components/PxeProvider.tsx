@@ -10,7 +10,7 @@ export const PxeProvider = ({ children }: { children: React.ReactNode }) => {
   const setPXEClient = useSetAtom(pxeAtom);
   // const setWalletSDK = useSetAtom(walletSDKAtom)
   // const [pxeLocal, setPXELocal] = useState<PXE>();
-  const [, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [, setErrorMessage] = useState("");
 
   useEffect(() => {

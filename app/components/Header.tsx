@@ -20,6 +20,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Spinner } from "./Spinnner";
 
+const shortenAddress = (address: string) => {
+  const str = address.toString();
+  return `${str.slice(0, 6)}...${str.slice(-4)}`;
+};
+
 export const Header = () => {
   const [currentWallet, setCurrentWallet] = useAtom(currentWalletAtom);
   const wallets = useAtomValue(walletsAtom);
@@ -27,12 +32,8 @@ export const Header = () => {
   const { createAccount, isCreating } = useAccount(pxe!);
   const wallet = useAtomValue(walletSDKAtom);
 
-  const shortenAddress = (address: string) => {
-    const str = address.toString();
-    return `${str.slice(0, 6)}...${str.slice(-4)}`;
-  };
-
-  useLoadAccountFromStorage(pxe!);
+  const { isLoading: isLoadingAccounts, error: accountsError } =
+    useLoadAccountFromStorage(pxe!);
 
   const handleConnectSdk = async () => {
     try {
@@ -50,6 +51,21 @@ export const Header = () => {
       console.error("Failed to create wallet:", error);
     }
   };
+
+  if (isLoadingAccounts) {
+    console.log("loading accounts", isLoadingAccounts);
+    return (
+      <div className="text-sm text-muted-foreground">
+        <Spinner /> Loading accounts...
+      </div>
+    );
+  }
+
+  if (accountsError) {
+    return (
+      <div className="text-sm text-destructive">Error: {accountsError}</div>
+    );
+  }
 
   return (
     <header className="border-b">
