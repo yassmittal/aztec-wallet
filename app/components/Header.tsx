@@ -56,7 +56,7 @@ export const Header = () => {
     console.log("loading accounts", isLoadingAccounts);
     return (
       <div className="text-sm text-muted-foreground">
-        <Spinner /> Loading accounts...
+        <Spinner />
       </div>
     );
   }

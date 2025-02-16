@@ -5,34 +5,58 @@ import { useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { pxeAtom } from "../atoms";
 import { RPC_URL } from "../constants";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { PXELoadingScreen } from "./PXELoadingScreen";
 
 export const PxeProvider = ({ children }: { children: React.ReactNode }) => {
   const setPXEClient = useSetAtom(pxeAtom);
-  // const setWalletSDK = useSetAtom(walletSDKAtom)
-  // const [pxeLocal, setPXELocal] = useState<PXE>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setErrorMessage("");
-    setIsLoading(true);
-    const pxeClient = createPXEClient(RPC_URL);
-    waitForPXE(pxeClient)
-      .then((_) => {
+    const initializePXE = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const pxeClient = createPXEClient(RPC_URL);
+        await waitForPXE(pxeClient);
+
         setPXEClient(pxeClient);
-        // const wallet = new PopupWalletSdk(pxeClient as any)
-        // setWalletSDK(wallet)
-
-        // setPXELocal(pxeClient);
-        console.log("Pxe created", pxeClient);
-      })
-      .catch((error) => {
-        setErrorMessage(error.toString());
-      })
-      .finally(() => {
+        console.log("PXE client initialized successfully");
+      } catch (error) {
+        console.error("Failed to initialize PXE client:", error);
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to connect to PXE client"
+        );
+      } finally {
         setIsLoading(false);
-      });
-  }, []);
+      }
+    };
 
-  return <div>{children}</div>;
+    initializePXE();
+  }, [setPXEClient]);
+
+  if (isLoading) {
+    return <PXELoadingScreen />;
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-4">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            Failed to initialize PXE client: {error}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
 };
