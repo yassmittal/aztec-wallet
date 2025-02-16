@@ -43,6 +43,14 @@ export const Header = () => {
     }
   };
 
+  const handleCreateWallet = async () => {
+    try {
+      await createAccount();
+    } catch (error) {
+      console.error("Failed to create wallet:", error);
+    }
+  };
+
   return (
     <header className="border-b">
       <div className="container mx-auto px-4 py-4">
@@ -98,12 +106,11 @@ export const Header = () => {
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem
-                  onClick={async () => {
-                    await createAccount();
-                  }}
+                <Button
+                  onClick={handleCreateWallet}
                   disabled={isCreating}
-                  className="flex items-center gap-2 px-4 py-2 cursor-pointer"
+                  variant="ghost"
+                  className="w-full flex items-center gap-2 cursor-pointer"
                 >
                   {isCreating ? (
                     <>
@@ -118,7 +125,7 @@ export const Header = () => {
                       <span className="font-medium">Create New Wallet</span>
                     </>
                   )}
-                </DropdownMenuItem>
+                </Button>
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
